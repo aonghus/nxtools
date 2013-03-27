@@ -1,7 +1,7 @@
 from collections import defaultdict
 import itertools
 import networkx as nx
-import nxcommunity as nxc
+import nxtools as nxt
 
 #    Copyright(C) 2011 by
 #    Ben Edwards <bedwards@cs.unm.edu>

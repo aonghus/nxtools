@@ -10,7 +10,7 @@ logging.basicConfig(format="[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)
 logging.getLogger().setLevel(logging.INFO)
 
 def main_old():
-    G = nx.barbell_graph(3,0)
+    G = nx.barbell_graph(3, 0)
     C = nxt.greedy_max_modularity_partition(G)
     nxt.write_community_gecmi(C, open('comm_gecmi.dat', 'w'))
     return
@@ -33,8 +33,8 @@ def main():
 
     print 'graph:', graph
     C = nxt.spectral_modularity_partition(graph)
-    #C = nxt.greedy_max_modularity_partition(graph)
-    nxc.write_community_gecmi(C, open('comm_gecmi.dat', 'w'))
+    # C = nxt.greedy_max_modularity_partition(graph)
+    nxt.write_community_gecmi(C, open('comm_gecmi.dat', 'w'))
 
 
     return

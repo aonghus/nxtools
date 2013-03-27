@@ -1,7 +1,7 @@
 from copy import deepcopy
 import random
 import networkx as nx
-import nxcommunity as nxc
+import nxtools as nxt
 
 #    Copyright(C) 2011 by
 #    Ben Edwards <bedwards@cs.unm.edu>
@@ -131,16 +131,16 @@ def greedy_max_modularity_partition(G, C_init=None, max_iter=10):
     if C_init is None:
         m1 = G.order() / 2
         m2 = G.order() - m1
-        C = nxc.random_partition(G.nodes(), partition_sizes=[m1, m2])
+        C = nxt.random_partition(G.nodes(), partition_sizes=[m1, m2])
     else:
-        if not nxc.is_partition(G, C_init):
+        if not nxt.is_partition(G, C_init):
             raise nx.NetworkXError("C_init doesn't partition G")
         if not len(C_init) == 2:
             raise nx.NetworkXError("C_init doesn't partition G into 2 communities")
         C = deepcopy(C_init)
             
 
-    C_mod = nxc.modularity(G, C)
+    C_mod = nxt.modularity(G, C)
     Cmax = deepcopy(C)
     Cnext = deepcopy(C)
 
@@ -163,7 +163,7 @@ def greedy_max_modularity_partition(G, C_init=None, max_iter=10):
             dc = [sum(G.degree(Cnext[0]).values()), \
                  sum(G.degree(Cnext[1]).values())]
             for n in ns:
-                n_comm = nxc.affiliation(n, Cnext)[0]
+                n_comm = nxt.affiliation(n, Cnext)[0]
                 d_eii = -len(set(G.neighbors(n)).intersection(Cnext[n_comm])) / m
                 d_ejj = len(set(G.neighbors(n)).intersection(Cnext[1 - n_comm])) / m
                 d_sum_ai = (G.degree(n) / (2 * m ** 2)) * \
