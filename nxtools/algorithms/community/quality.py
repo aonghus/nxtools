@@ -113,7 +113,7 @@ def modularity(G, communities, weight='weight'):
     return Q * norm
 
 
-def modularityOverlap(G, communities, affiliation_dict=None, weight='weight'):
+def modularityOverlap(G, communities, affiliation_dict=None, weight=None):
     r"""Determines the Overlapping Modularity of a partition C
     on a graph G.
 
@@ -166,11 +166,20 @@ def modularityOverlap(G, communities, affiliation_dict=None, weight='weight'):
     except:
         binom = choose
     """
-    if G.is_directed() is True:
-        raise NetworkXError("G should be undirected")
+
+    if G.is_multigraph():
+        raise NetworkXError("G should be not be a multigraph")
 
     if not affiliation_dict:
         affiliation_dict = nxutil.affiliation_dict(communities)
+    
+    # actually this factor is not necessary- I double count the edges for undirected graphs, 
+    # so the factor turns out to be the same as for directed 
+    # if G.is_directed():
+    #    edgeCountNorm = 2
+    # else:
+    #    edgeCountNorm = 1
+    # logging.info('edgeCountNorm {}'.format(edgeCountNorm))
     
     mOvTotal = 0
     
@@ -180,74 +189,28 @@ def modularityOverlap(G, communities, affiliation_dict=None, weight='weight'):
         # logging.info('commId {} {}'.format(commId, nCommNodes))
         nInwardEdges = 0 
         commStrength = 0
+
         for node in nodes:
             degree, inwardEdges, outwardEdges = 0, 0, 0
-            for edge in G.edges(node):
-                degree += 1
-                if edge[1] in nodes:
-                    inwardEdges += 1
+            for (u, v, data) in G.edges(node, data=True):
+                weight = data.get(weight, 1)
+                degree += weight
+                if v in nodes:
+                    inwardEdges += weight
                 else:
-                    outwardEdges += 1
+                    outwardEdges += weight
 
             nInwardEdges += inwardEdges
             affiliationCount = len(affiliation_dict[node])        
             commStrength += (inwardEdges - outwardEdges) / (degree * affiliationCount)
             # logging.info('{} {} {} {}'.format(commId, node, degree, affiliationCount))
         
-        binomC = nCommNodes * (nCommNodes - 1) / 2
-        # binomC = choose(nCommNodes, 2)
-        v1 = commStrength / nCommNodes
-        v2 = (nInwardEdges / 2 / binomC)
-        
-        # mOv = commStrength * (nInwardEdges / binomC) / nCommNodes
-        mOv = v1 * v2
-        logging.info('comm, len(comm), v1, v2 = mOv: {} {} {} {}'.format(commId, nCommNodes, v1, v2, mOv))
-        mOvTotal += mOv
-
-    return mOvTotal / len(communities)
-
-
-
-def modularityOverlapDirected(G, communities, affiliation_dict=None, weight='weight'):
-    r"""
-    
-    attempt at directed version
-    
-    the normalisation for the edges binom(n_cr, 2) is doubled for a directed graph
-    Determines the Overlapping Modularity of a partition C
-
-    """
-
-    if G.is_directed() is False:
-        raise NetworkXError("G should be directed")
-
-    if not affiliation_dict:
-        affiliation_dict = nxutil.affiliation_dict(communities)
-    
-    mOvTotal = 0
-    
-    for commId, nodes in communities.iteritems():
-        nCommNodes = len(nodes)
-        if nCommNodes <= 1: continue
-        # logging.info('commId {} {}'.format(commId, nCommNodes))
-        nInwardEdges = 0 
-        commStrength = 0
-        for node in nodes:
-            degree, inwardEdges, outwardEdges = 0, 0, 0
-            for edge in G.edges(node):
-                degree += 1
-                if edge[1] in nodes:
-                    inwardEdges += 1
-                else:
-                    outwardEdges += 1
-
-            nInwardEdges += inwardEdges
-            affiliationCount = len(affiliation_dict[node])        
-            commStrength += (inwardEdges - outwardEdges) / (degree * affiliationCount)
-            # logging.info('{} {} {} {}'.format(commId, node, degree, affiliationCount))
-            
         binomC = nCommNodes * (nCommNodes - 1)
-        mOv = commStrength * (nInwardEdges / binomC) / nCommNodes
+        v1 = commStrength / nCommNodes
+        v2 = (nInwardEdges / binomC)
+        mOv = v1 * v2
+        logging.info('comm, len(comm), v1, v2 = mOv: {} {} {} {} {}'.format(commId, nCommNodes, v1, v2, mOv))
         mOvTotal += mOv
 
     return mOvTotal / len(communities)
+
