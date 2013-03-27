@@ -1,0 +1,18 @@
+include MANIFEST.in
+include setupegg.py
+include setup.py
+include LICENSE.txt
+include README.txt
+
+recursive-include nxtools *.py *.edgelist *.mbox *.gz *.bz2 *.zip
+recursive-include examples *.py *.edgelist *.mbox *.gz *.bz2 *.zip
+recursive-include doc *.py *.rst Makefile *.html *.png *.txt *.css
+
+include tests/*.py
+include tests/*.ipynb
+
+global-exclude *~
+global-exclude *.pyc
+global-exclude .svn
+global-exclude .git
+
