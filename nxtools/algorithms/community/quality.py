@@ -5,17 +5,20 @@ import networkx as nx
 import nxtools as nxt
 
 import logging
-
 logging.basicConfig(format="[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s")
 logging.getLogger().setLevel(logging.INFO)
+
 #    Copyright(C) 2011 by
 #    Ben Edwards <bedwards@cs.unm.edu>
 #    Aric Hagberg <hagberg@lanl.gov>
+#    Aonghus Lawlor <aonghuslawlor@gmail.com>
+#    Cathal Coffey <coffey.cathal@gmail.com>
 #    All rights reserved.
 #    BSD license.
 __author__ = """\n""".join(['Ben Edwards (bedwards@cs.unm.edu)',
                           'Aric Hagberg (hagberg@lanl.gov)',
-                          'Aonghus Lawlor (aonghuslawlor@gmail.com)'])
+                          'Aonghus Lawlor (aonghuslawlor@gmail.com)',
+                          'Cathal Coffey (coffey.cathal@gmail.com)'])
 
 
 def choose(n, k):
@@ -185,7 +188,10 @@ def modularityOverlap(G, communities, affiliation_dict=None, weight=None):
     
     for commId, nodes in communities.iteritems():
         nCommNodes = len(nodes)
+        
+        # the contribution of communities with 1 node is 0
         if nCommNodes <= 1: continue
+        
         # logging.info('commId {} {}'.format(commId, nCommNodes))
         nInwardEdges = 0 
         commStrength = 0
