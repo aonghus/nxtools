@@ -5,7 +5,7 @@ import networkx as nx
 import nxtools as nxt
 
 import logging
-logging.basicConfig(format="[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s")
+logging.basicConfig(format="# [%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s")
 logging.getLogger().setLevel(logging.INFO)
 
 #    Copyright(C) 2011 by
@@ -193,29 +193,29 @@ def modularityOverlap(G, communities, affiliation_dict=None, weight=None):
         if nCommNodes <= 1: continue
         
         # logging.info('commId {} {}'.format(commId, nCommNodes))
-        nInwardEdges = 0 
+        nInwardEdges = 0
         commStrength = 0
 
         for node in nodes:
             degree, inwardEdges, outwardEdges = 0, 0, 0
             for (u, v, data) in G.edges(node, data=True):
-                weight = data.get(weight, 1)
-                degree += weight
+                w = data.get(weight, 1)                
+                degree += w
                 if v in nodes:
-                    inwardEdges += weight
+                    inwardEdges += w
+                    nInwardEdges += 1
                 else:
-                    outwardEdges += weight
+                    outwardEdges += w
 
-            nInwardEdges += inwardEdges
             affiliationCount = len(affiliation_dict[node])        
             commStrength += (inwardEdges - outwardEdges) / (degree * affiliationCount)
-            # logging.info('{} {} {} {}'.format(commId, node, degree, affiliationCount))
+            # logging.info('size[{}] node[{}] diff[{}]'.format(nCommNodes, node, inwardEdges - outwardEdges))
         
         binomC = nCommNodes * (nCommNodes - 1)
         v1 = commStrength / nCommNodes
         v2 = (nInwardEdges / binomC)
         mOv = v1 * v2
-        logging.info('comm, len(comm), v1, v2 = mOv: {} {} {} {} {}'.format(commId, nCommNodes, v1, v2, mOv))
+        logging.info('comm[{}] nCr[{}] v1[{}] v2[{}] mOv[{}]'.format(commId, nCommNodes, v1, v2, mOv))
         mOvTotal += mOv
 
     return mOvTotal / len(communities)
